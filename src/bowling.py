@@ -17,7 +17,7 @@ class Bowling:
             puntaje = self.max_bolos
         elif self.tabla_tiradas[posicion_signo] == self.nulo:
             puntaje = 0
-        elif self.tabla_tiradas[posicion_signo] == self.spare:
+        elif self.tabla_tiradas[posicion_signo] == self.spare: 
             puntaje = self.max_bolos - self.tabla_tiradas[posicion_signo - 1]
         return puntaje
 
@@ -35,6 +35,13 @@ class Bowling:
 
         puntos_strike = tirada_actual + primera_siguiente + segunda_siguiente
         return puntos_strike
+    
+    def Spare_Puntuacion(self, posicion_actual):
+        tirada_actual = puntaje = self.max_bolos - Bowling.Equivalencias_puntaje_signo(self, posicion_actual - 1)
+        posicion_siguiente = Bowling.Equivalencias_puntaje_signo(self, posicion_actual + 1)
+
+        puntos_spare = tirada_actual + posicion_siguiente 
+        return puntos_spare
 
 
     def Calcular_puntuacion(self):
@@ -54,6 +61,7 @@ class Bowling:
                     posicion_actual += 1
                         ####SPARE#### - 
                 elif puntuacion_tirada == self.spare:
+                    puntuacion_total += Bowling.Spare_Puntuacion(self, posicion_actual)                    
                     contador_tiradas += 1
                     posicion_actual += 1 
                 elif puntuacion_tirada == self.strike:
