@@ -1,87 +1,88 @@
-
-class Bowling:
-
+class Puntuacion_total_bolos:
+    ##### defino las constantes en global#######
+    ##### cuáles son los símbolos que representan cada tipo de tirada especial (entendiendo por especial la que no es open)
+    NULO = '-'
+    SPARE = '/'
+    STRIKE = 'X'
+    ####### máximo de bolos y máximo de turnos 
+    MAX_BOLOS = 10
+    MAX_TURNOS = 10
+    
     def __init__(self, tabla_tiradas):
-        self.tabla_tiradas = tabla_tiradas
-        self.numero_estandar_tiradas = 20 #entendemos como número estándar de tiradas una partida en la que no hay strikes. Esto será útil porque definiremos como última tirada (que tiene un algoritmo diferente para el puntaje) la 20. Jugaremos con el contador de tiradas para que aunque haya strikes la última caiga en 20 (esto es, si hay strike aunque en realidad tiramos solo una vez, lo contamos como 2 tiradas)
-        self.max_bolos = 10 #no estoy segura de si estoy haciendo el tonto con esto. Supongo que puede ser útil si de repente deciden que se juega a bolos con 15 bolos (??¿)
-        ###### los siguientes son para la equivalencia puntaje-signo
-        self.numeros = ['1', '2', '3', '4', '5', '6', '7', '8', '9']
-        self.strike = 'X'
-        self.nulo = '-'
-        self.spare= '/'
+        self.tabla_tiradas = list(tabla_tiradas)
+        self.puntuacion = 0 ######## La puntuación esta se irá actualizando con cada función####
+        self.total_tiradas= 0 #### esto es para saber la posición, necesario para calcular las tiradas extra en el spare y el strike
+        self.tiradas_por_turno = 0 #necesario para actualizar los turnos, en las puntuaciones open y nulo será necesario para poder actualizar cuando llega el siguiente turno (cuando llegue a 2 sumará 1 turno)
+        self.turnos = 1 #este 1 lo pongo para que el frame especial sea el número 10 
+        self.ultimo_numero = 0 ##### esto es para calcular la puntuacion del spare restando el último número que ha salido. Se va actualizando en cada open y cada nulo (en spare y strike no porque no puede haber un spare después de un strike o un spare)
 
-    def Equivalencias_puntaje_signo(self, posicion_signo):
-        if self.tabla_tiradas[posicion_signo] in self.numeros:
-            puntaje = int(self.tabla_tiradas[posicion_signo]) #el número tal cual, pero lo inteamos :)
-        elif self.tabla_tiradas[posicion_signo] == self.strike:
-            puntaje = self.max_bolos #strike vale el maximo de bolos, que son 10
-        elif self.tabla_tiradas[posicion_signo] == self.nulo:
-            puntaje = 0 #nulo es 0
-        elif self.tabla_tiradas[posicion_signo] == self.spare: 
-            puntaje = self.max_bolos - int(self.tabla_tiradas[posicion_signo - 1]) #esto es máximo de bolos (10) menos los bolos que ya habías tirado en la ronda anterior, aquí no me tengo que preocupar, ya que lo único que puede haber antes de un spare es un digito
-        return puntaje
-
-
-    @staticmethod
-    def Open(puntuacion_tirada):
-        puntuacion_open = int(puntuacion_tirada)
-        return puntuacion_open
+    def equivalencias_puntuacion_simbolo(self, lista_tiradas): ###esto no está en el diagrama del modelo pero ha sido necesario añadirlo para implementar la lógica.
+        puntuacion = 0
+        for tirada in lista_tiradas:
+            if tirada == Puntuacion_total_bolos.NULO:
+                puntuacion += 0
+                self.ultimo_numero = 0
+            if tirada.isdigit():
+                puntuacion += int(tirada)
+                self.ultimo_numero = tirada  ### hay que actualizar el último número
+            if tirada == Puntuacion_total_bolos.SPARE:
+                puntuacion += Puntuacion_total_bolos.MAX_BOLOS - int(self.ultimo_numero) #int porque detrás de un spare solo puede ir un número (el numero de bolos que has tirado)
+            if tirada == Puntuacion_total_bolos.STRIKE:
+                puntuacion += Puntuacion_total_bolos.MAX_BOLOS
+        return puntuacion
 
 
-    def Strike_Puntuacion(self, posicion_actual): #llama al método equivalencias puntaje signo y le pasa la posicion siguiente y la segunda siguiente. Todo esto se suma a la puntuación del strike que sería el máximo de bolos, esto es 10.
-        tirada_actual = self.max_bolos #10
-        primera_siguiente = Bowling.Equivalencias_puntaje_signo(self, posicion_actual + 1) # ¿cuánto vale el signo siguiente?
-        segunda_siguiente = Bowling.Equivalencias_puntaje_signo(self, (posicion_actual + 2)) # ¿Cuánto vale el signo de dos posiciones más adelante?
 
-        puntos_strike = tirada_actual + primera_siguiente + segunda_siguiente #suma todo :)
-        return puntos_strike
-    
-    def Spare_Puntuacion(self, posicion_actual):  #Para calcular los bolos tirados en la ronda resta a 10 el puntaje de la posicion anterior (la puntuacion anterior la sabe llamando al metodo de equivalencias y usando como parámetro una posicion menos que la acutal posicion_actual - 1) luego llamando al mismo método calcula el puntaje siguiente (porque se tiene que sumar) y lo suma
-        tirada_actual = puntaje = self.max_bolos - Bowling.Equivalencias_puntaje_signo(self, posicion_actual - 1)
-        posicion_siguiente = Bowling.Equivalencias_puntaje_signo(self, posicion_actual + 1)
+    def puntuacion_partida(self):
+        for tirada in self.tabla_tiradas: ###esta función recorre la tabla de tiradas y distribuye: le pasa cada puntuación de tirada a la función correspondiente (open, strike...)
+            if self.turnos < Puntuacion_total_bolos.MAX_TURNOS:
+                if tirada.isdigit():
+                    Puntuacion_total_bolos.puntuacion_open(self, tirada)
+                if tirada == Puntuacion_total_bolos.NULO:
+                    Puntuacion_total_bolos.puntuacion_nulo(self, tirada)
+                if tirada == Puntuacion_total_bolos.SPARE:
+                    self.puntuacion += Puntuacion_total_bolos.puntuacion_spare(self)
+                if tirada == Puntuacion_total_bolos.STRIKE:
+                    self.puntuacion += Puntuacion_total_bolos.puntuacion_strike(self)
+                ######FRAME ESPECIAL########## -Lo pasa a una función que simplemente sumará todo de ahí en adelante (tomando las equivalencias ente la puntuación y el símbolo). Cuando el turno sea el 10 (lo he "hackeado un poquito empezando los turnos desde 1 y no desde 0")
+            elif self.turnos == Puntuacion_total_bolos.MAX_TURNOS:
+                    self.puntuacion += Puntuacion_total_bolos.puntuacion_tenth(self)
+                    return self.puntuacion ###esto va aquí pq quiero que se ejecute después de haber contado la última tirada. como sólo necesitamos la puntuación final (y no puntuaciones intermedias) no molesta
+            self.total_tiradas += 1 #actualizamos la posición de las tiradas en cada iteración del for
 
-        puntos_spare = tirada_actual + posicion_siguiente 
-        return puntos_spare
-
-
-    def Calcular_puntuacion(self):
-        puntuacion_total = 0
-        contador_tiradas = 0 #esto es para controlar cuál es la última posicion
-        posicion_actual = 0 # Parece absurdo tener un contador de tiradas y otro de posicion pero es importante para luego calcular strikes, spares e historias
-        for puntuacion_tirada in self.tabla_tiradas:
-                        ####NULO#### - simplemente seguimos con contador
-            if puntuacion_tirada == self.nulo:
-                contador_tiradas += 1 #no sumamos nada a la puntuación
-                posicion_actual += 1
-                        #####NORMAL(numero)#### -actualizamos contador y sumamos numero de bolos al puntaje total
-            elif puntuacion_tirada.isdigit() == True:
-                puntuacion_total += Bowling.Open(puntuacion_tirada)                    
-                contador_tiradas += 1
-                posicion_actual += 1
-                        ####SPARE#### - 
-            elif puntuacion_tirada == self.spare:
-                if contador_tiradas <18:
-                    puntuacion_total += Bowling.Spare_Puntuacion(self, posicion_actual)                    
-                    contador_tiradas += 1
-                    posicion_actual += 1
-                if contador_tiradas >= 18:
-                    puntuacion_total +=  Bowling.Equivalencias_puntaje_signo(self, posicion_actual)
-                    posicion_actual += 1 #aquí seguir sumando en el contador de tiradas ya es irrelevante
-            elif puntuacion_tirada == self.strike:
-                if contador_tiradas <18:
-                    puntuacion_total +=  Bowling.Strike_Puntuacion(self, posicion_actual)
-                    contador_tiradas += 2 #aquí se suma otro(porque queremos que llegue hasta un numero fijo de tiradas, 20, independientemente de que se tiren menos porque se hacen strikes), no se suman los dos a la vez porque si no es un lío a la hora de calcular los puntos siguientes.
-                    posicion_actual += 1
-                if contador_tiradas >= 18:
-                    puntuacion_total += self.max_bolos
-                    posicion_actual += 1
 
     
+    def puntuacion_open(self, tirada):
+        self.tiradas_por_turno += 1 ##hemos hecho 1 tirada, la sumamos al turno (esto no lo hacemos en puntuacion_partida() pq por ejemplo los strikes suman diferente)
+        self.puntuacion += int(tirada) ##sumar tirada
+        if self.tiradas_por_turno == 2: ##cada vez que sea la segunda tirada del turno reiniciamos el contador de tiradas por turno y actualizamos turno sumando 1.
+            self.turnos += 1
+            self.tiradas_por_turno = 0
+        self.ultimo_numero = tirada
 
-        return puntuacion_total
+    def puntuacion_nulo(self, tirada):
+        CERO = 0
+        self.puntuacion += CERO ##si es nulo la puntuación es 0
+        self.tiradas_por_turno += 1
+        if self.tiradas_por_turno == 2: ##cada vez que sea la segunda tirada del turno reiniciamos el contador de tiradas por turno y actualizamos turno sumando 1.
+            self.turnos += 1
+            self.tiradas_por_turno = 0 ## Aquí no va como constante el 0 porque es diferente, no es 0 por ser nulo, es 0 porque hay que reiniciar el contador cuando llega a 2 
+        self.ultimo_numero = CERO            
 
-if __name__ == "__main__":
-    #assert Bowling("11111111111111111111").Calcular_puntuacion() == 20
-    #assert Bowling("X1111111111111111111").Calcular_puntuacion() == 31
-    assert Bowling("8/549-XX5/53639/9/X").Calcular_puntuacion() == 149
+    
+    def puntuacion_spare(self):
+        lista_tiradas = self.tabla_tiradas[self.total_tiradas : self.total_tiradas + 2] ##le paso esta tirada y la siguiente a la función que interpreta símbolos
+        self.turnos += 1  ##siempre que hay spare es en la segunda tirada, podemmos simplemete actualizar el turno y el contador de tiradas por turno
+        self.tiradas_por_turno = 0  
+        return Puntuacion_total_bolos.equivalencias_puntuacion_simbolo(self, lista_tiradas)
+
+
+    def puntuacion_strike(self):
+        lista_tiradas = self.tabla_tiradas[self.total_tiradas : self.total_tiradas + 3] ###pasas esta tirada y las 2 siguientes 
+        self.turnos += 1 ##siempre que hay strike se salta de turno
+        return Puntuacion_total_bolos.equivalencias_puntuacion_simbolo(self, lista_tiradas)
+
+    def puntuacion_tenth(self): ###el nombre tenth puede ser cambiable por última tirada, teniendo en cuenta que se modificaran el número de tiradas que tiene el juego, pero la logica es la misma.
+        lista_tiradas = self.tabla_tiradas[self.total_tiradas :] ##pasa de la tirada en adelante y se dedicará solo a sumar simbolitos, sin más lógica.
+        return Puntuacion_total_bolos.equivalencias_puntuacion_simbolo(self, lista_tiradas)
+
