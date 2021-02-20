@@ -82,7 +82,7 @@ class Puntuacion_total_bolos:
         self.turnos += 1 ##siempre que hay strike se salta de turno
         return Puntuacion_total_bolos.equivalencias_puntuacion_simbolo(self, lista_tiradas)
 
-    def puntuacion_tenth(self): ###el nombre tenth puede ser cambiable por última tirada, teniendo en cuenta que se modificaran el número de tiradas que tiene el juego, pero la logica es la misma.
+    def puntuacion_tenth(self): ###el nombre tenth puede ser cambiable por última tirada, teniendo en cuenta que se pudieran modificar el número de tiradas que tiene el juego, pero la logica es la misma.
         lista_tiradas = self.tabla_tiradas[self.total_tiradas :] ##pasa de la tirada en adelante y se dedicará solo a sumar simbolitos, sin más lógica.
         return Puntuacion_total_bolos.equivalencias_puntuacion_simbolo(self, lista_tiradas)
 

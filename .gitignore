@@ -136,3 +136,4 @@ dmypy.json
 .history/
 /Pipfile
 .vscode
+/src/__pycache__
