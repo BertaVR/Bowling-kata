@@ -4,10 +4,10 @@
 
 Este kata es uno de los primeros kata que hice para aprender programación orientada a objetos. Consistió en diseñar un programa en Python que calculara la puntuación final de una partida de bowling dada su tarjeta de puntuación.
 
-❌No consistía en escribir un programa que calculara la puntuación precisa durante las tiradas del juego.
-❌No checkea si las tiradas son válidas.
-❌No valida el número correcto de tiradas y frames.
-✔️Solo consistía en escribir un programa que fuera capaz de calcular correctamente la **puntuación final** de la partida al acabar.
+- ❌No consistía en escribir un programa que calculara la puntuación precisa durante las tiradas del juego.
+- ❌No checkea si las tiradas son válidas.
+- ❌No valida el número correcto de tiradas y frames.
+- ✔️Solo consistía en escribir un programa que fuera capaz de calcular correctamente la **puntuación final** de la partida al acabar.
 
 ## Experiencia
 Tuve mis dificultades con este kata ya que no conseguía implementar correctamente el último frame. El problema era que no conseguía gestionar los contadores de manera adecuada para controlar cuándo empezaba el último frame. Empecé de nuevo el código a partir de un modelo DDD e intentando llevar un mejor control de los contadores (tarea en la que VictorPorlan me ayudó mucho) y finalmente conseguí que el programa pasara los casos test.
