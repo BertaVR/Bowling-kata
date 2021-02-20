@@ -10,7 +10,7 @@ Este kata es uno de los primeros kata que hice para aprender programación orien
 - ✔️Solo consistía en escribir un programa que fuera capaz de calcular correctamente la **puntuación final** de la partida al acabar.
 
 ## Experiencia
-Tuve mis dificultades con este kata ya que no conseguía implementar correctamente el último frame. El problema era que no conseguía gestionar los contadores de manera adecuada para controlar cuándo empezaba el último frame. Empecé de nuevo el código en un nuevo repositorio (repositorio bowling-2) a partir de un modelo DDD e intentando llevar un mejor control de los contadores (tarea en la que mi compañero [VictorPorlan](https://github.com/VictorPorlan/) me ayudó mucho) y finalmente conseguí que el programa pasara los casos test.
+Tuve mis dificultades con este kata ya que no conseguía implementar correctamente el último frame. El problema era que no conseguía gestionar los contadores de manera adecuada para controlar cuándo empezaba el último frame. Empecé de nuevo el código en un nuevo repositorio (repositorio [bowling-2](https://github.com/BertaVR/Bowling-2/)) a partir de un modelo DDD e intentando llevar un mejor control de los contadores (tarea en la que mi compañero [VictorPorlan](https://github.com/VictorPorlan/) me ayudó mucho) y finalmente conseguí que el programa pasara los casos test.
 
 ## Reglas del negocio
 
